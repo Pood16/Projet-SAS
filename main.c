@@ -91,7 +91,7 @@ int main(){
         printf("3. Statistiques et Rapports\n");
         printf("\tEntrer votre choix : ");
         scanf("%d", &option);
-        getchar();//pour eliminer le buffer de scanf()
+        getchar();
         switch(option){
             case 1:
                 user_compte();
