@@ -52,7 +52,7 @@ void sign_up(){
 
     }
     user_count++;
-    users[user_count].identifiant = user_count+1; //admin = 0 
+    users[user_count].identifiant = user_count; //admin = 0 
     printf("your identifiant est %d\n", users[user_count].identifiant);
 }
 //verifier les contraintes de mots de passe
@@ -98,7 +98,7 @@ void sign_in(){
         fgets(pass, 40, stdin);
         pass[strcspn(pass, "\n")] = '\0';
         for (int i=0; i<user_count; i++){
-            if (id == users[i].identifiant && strcmp(users[i].password, pass) == 0){
+            if (users[i].identifiant == id && strcmp(users[i].password, pass) == 0){
                 printf("sign in successfully\n");
                 break;
             }

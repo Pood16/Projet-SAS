@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 int pass_check(char pass[]);
-
 typedef struct{
     int identifiant;
     char nom[30];
@@ -12,10 +11,7 @@ typedef struct{
 }User;
 User users[100];
 int user_count = 0;
-int id = 0;
-
-
-void user_compte(){
+void user_compte(){//creer un utilisateur
     char pass[40];
     printf("\nEntrer les informations suivantes :\n");
 
@@ -46,10 +42,37 @@ void user_compte(){
 
     }
     user_count++;
-    users[user_count].identifiant = user_count;
-   
+    users[user_count].identifiant = user_count;  
+    printf("your identifiant est %d\n", users[user_count].identifiant);
 }
-int pass_check(char pass[]){
+void sign_in(){
+    int id;
+    char pass[40];
+    int tentative=0;
+    printf("Entrer les informations suivantes : \n");
+    while(1){
+        printf("Identifiant : ");
+        scanf("%d", &id);
+        getchar();
+        printf("mot de passe : ");
+        fgets(pass, 40, stdin);
+        pass[strcspn(pass, "\n")] = '\0';
+        for (int i=0; i<user_count; i++){
+            if (id == users[i].identifiant && strcmp(users[i].password, pass) == 0){
+                printf("sign in successfully\n");
+                break;
+            }
+            else{
+                printf("Verifier vos informations.\n");
+                break;
+            }
+        }
+    }
+    
+
+}
+
+int pass_check(char pass[]){//les contraintes de mot de passe
     int majuscule = 0, miniscule = 0, chiffre = 0, speciale = 0;
      if(strlen(pass)>=8){
         for (int i =0; i<strlen(pass); i++){
@@ -81,6 +104,7 @@ int pass_check(char pass[]){
 
 
 
+
 int main(){
     int option;
     
@@ -95,7 +119,9 @@ int main(){
         switch(option){
             case 1:
                 user_compte();
-                
+                break;
+            case 2:
+                sign_in();
                 break;
         }
 
