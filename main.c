@@ -6,10 +6,15 @@
 #define MAX_CHARACTER 50
 #define MAX_RECLAMATION 300
 /*...... les Fonctions .........*/
+void role();
+//void gestion_reclamation();
+//void statistique();
 int password_check(char pass[]);
 void admin_tache();
+void agent_de_reclamation_tache();
 void client_tache();
 void creer_reclamation();
+void afficher_reclamation();
 void modifier_reclamation();
 void supprimer_reclamation();
 /*......... end Fonction ..........*/
@@ -18,14 +23,16 @@ typedef struct {
     char nom[40];
     int identifiant;
     char password[40];
+    int admin_role;
 }Admin;
-Admin admin = {"admin", 0000, "Admin@2024"};
+Admin admin = {"admin", 0000, "Admin@2024", 0};
 //information dec lient
 typedef struct{
     char nom[40];
     char prenom[40];
     int identifiant;
     char password[40];
+    int user_role;
 }Client;
 Client users[MAX_CLIENT];
 int user_counter = 0;
@@ -41,7 +48,7 @@ typedef struct{
 Reclamation reclamations[MAX_RECLAMATION];
 
 /*....................... end block des structores .............*/
-/*............ Block de defiinition des Fonction ..................*/
+/*............ Block de definition des Fonction ..................*/
 
 /* ....................... Fonction de creation de compte ......................*/
 void creer_compte(){
@@ -73,6 +80,24 @@ void creer_compte(){
     }
     printf("------> user identifiant : %d\n",users[user_counter].identifiant);
     user_counter++;  
+}
+/*........... attribue role ............*/
+void role(){
+    int iden, rol, found = 0;
+    printf("Entrer l'identifiant de l'utilisateur : ");
+    scanf("%d", &iden);
+    printf("choisi le nouveau role: ");
+    scanf("%d", &rol);//1 pour agent de recla et 2 pour client
+    for (int i=0; i<user_counter; i++){
+        if (users[i].identifiant == iden){
+            found = 1;
+            users[i].user_role = rol;
+        }
+    }
+    if (found){
+        printf("Le role a ete bien changer.\n");
+    }
+
 }
 /*............................. verifier les contraintes de mots de passe ..............*/
 int password_check(char pass[]){
@@ -120,13 +145,19 @@ void connecter(){
         }
         for (int i=0; i<user_counter; i++){
             printf("user id : %d and entred is %d\n", users[i].identifiant, id);
-            if (users[i].identifiant == id && strcmp(users[i].password, pass) == 0){
-                printf("Bonjour %s\n", users[i].nom);
-                creer_reclamation();
+            if (users[i].identifiant == id && strcmp(users[i].password, pass) == 0 && users[i].user_role == 2){
+                //printf("Bonjour %s\n", users[i].nom);
+                client_tache();
                 login = 1;
                 break;
             }
-            else {
+            else if(users[i].identifiant == id && strcmp(users[i].password, pass) == 0 && users[i].user_role == 1){
+                //printf("Bonjour %s\n", users[i].nom);
+                agent_de_reclamation_tache();
+                login = 1;
+                break;
+            }
+            else{
                 printf("mot de passe ou identifiant est incorrecte.\n");
                 tentative++;   
             }
@@ -141,9 +172,11 @@ void connecter(){
         
     }
 }
+
 /*...................... Fonction de creation de reclamation......*/
+int reclamation_counter = 0;
 void creer_reclamation(){
-    int reclamation_counter = 0;
+   
     printf("rempli les informations suivantes pour creer votre reclamation : \n");
     
     printf("Motif : ");
@@ -154,31 +187,57 @@ void creer_reclamation(){
     fgets(reclamations[reclamation_counter].categorie, 40, stdin);
     reclamations[reclamation_counter].categorie[strcspn(reclamations[reclamation_counter].categorie, "\n")] = '\0';
 
-    
+    printf("Description : ");
+    fgets(reclamations[reclamation_counter].description, 40, stdin);
+    reclamations[reclamation_counter].description[strcspn(reclamations[reclamation_counter].description, "\n")] = '\0';
+   
     printf("Status : ");
     fgets(reclamations[reclamation_counter]._status, 40, stdin);
     reclamations[reclamation_counter]._status[strcspn(reclamations[reclamation_counter]._status, "\n")] = '\0';
-    
+
+    //time_t date = time(NULL); 
+    reclamation_counter++;
+    reclamations[reclamation_counter].ID = reclamation_counter;
+    printf("reclamation a ete bien creer.\n");
+    client_tache();
 }
+/*....... afficher une reclamation .......*/
+void afficher_reclamation(){
+    for (int i=0; i< reclamation_counter; i++){
+        printf("====== Reclamation %d ==========\n", reclamation_counter);
+        printf("Motif : %s\n", reclamations[i].motif);
+        printf("category : %s\n", reclamations[i].categorie);
+        printf("Description : %s\n", reclamations[i].description);
+        printf("status : %s\n", reclamations[i]._status);
+    }
+}
+
 /*............... Creation des Menus ..................*/
 /*................... admin menu .....................*/
 void admin_tache(){
     int status;
     do{
-        printf("Taches d'un Administrateur : \n");
-        printf("1.  Afficher La list des reclamations.\n");
-        printf("2.  Modifier une reclamation.\n");
-        printf("3.  supprimer une reclamation.\n");
-        printf("4.  Traiter une reclamation.\n");
-        printf("5.  Rechercher une reclamation.\n");
-        printf("6.  Afficher les reclamations par priorite.\n");
-        printf("7.  Afficher le nombre total de reclamations.\n");
-        printf("8.  Afficher le taux de resolution des reclamations.\n");
-        printf("9.  Le delai de Traitement des reclamations.\n");
+        printf("\n========== Admin menu ==========\n");
+        printf("1.  gestion des utilisateurs.\n");
+        printf("2.  gestion des reclamations.\n");
+        printf("3.  generation des statistiques.\n");
         printf("0.  Revenue au menu principale.\n");
         printf("Choisit l'opperation : ");
         scanf("%d", &status);
         getchar();
+        switch (status){
+            case 1:
+                role();
+                break;
+            case 2:
+                //gestion_reclamation();
+                printf("1");
+                break;
+            case 3:
+                //statistique();
+                printf("2");
+                break;
+        }
     }while (status != 0);
     
 }
@@ -186,6 +245,7 @@ void admin_tache(){
 void client_tache(){
     int client_option;
     do {
+        printf("\n========== Client menu ==========\n");
         printf("[1].    Ajouter une reclamation.\n");
         printf("[2].    Modifier une reclamation.\n");
         printf("[3].    Supprimer une reclamation.\n");
@@ -196,11 +256,44 @@ void client_tache(){
             case 1:
                 creer_reclamation();
                 break;
+            case 2:
+                afficher_reclamation();
+                break;
 
         }
     }while (client_option !=0);
 
 }
+/*............ agent de reclamation .........*/
+void agent_de_reclamation_tache(){
+    int choix_agent;
+      do {
+        printf("\n========== Agent Menu ==========\n");
+        printf("1. Afficher toute les reclamations\n");
+        printf("2. Traiter la reclamation\n");
+        printf("0. deconnexion\n");
+        printf("veuillez entrer votre choice: ");
+        scanf("%d", &choix_agent);
+        printf("\n*************************\n\n");
+        getchar();
+
+        switch (choix_agent) {
+            case 1:
+                printf("traitement");
+                break;
+            case 2:
+                printf("traitement\n");
+                break;
+            case 0:
+                printf("deconnexion ...\n");
+                break;
+            default:
+                printf("invalid choice. essayer a nouveau\n");
+        }
+    } while (choix_agent != 0);
+}
+
+
 int main(){
     int choix;
     do{
