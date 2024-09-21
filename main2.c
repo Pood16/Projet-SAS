@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h> 
+#include <time.h>
 #define MAX_USERS 100
+#define MAX_RECLAMATION 100
 //declaration des fonctions
 void admin();
 void creer_compte();
@@ -15,6 +17,7 @@ void menu_role(int userIndex);
 //void menu_gestion();
 //global variables et initialisation
 int user_count = 1;
+int reclamation_count = 0;
 //user structure
 typedef struct {
     char fullName[50];
@@ -30,6 +33,16 @@ void admin(){
     strcpy(users[0].password, "Admin@2024");
     users[0].identifiant = 0;
 }
+//structure des reclamations
+typedef struct{
+    int ID;
+    char motif[30];
+    char description[200];
+    char categorie[30];
+    char status[30];
+    char date[30];
+}Reclamation;
+Reclamation reclamations[MAX_RECLAMATION];
 //creer un compte
 void creer_compte(){
     //verifier qu il ya encore d'espace
@@ -178,14 +191,49 @@ void gerer_role(){
     }
     printf("Le role est bien changer.\n");
 }
+void list_users(){
+    for (int i=0; i<user_count; i++){
+        printf("***************************************\n");
+        printf("informations de l'utilisateur %d : \n", i+1);
+        printf("nom complet : %s\n", users[i].fullName);
+        printf("user identifiant : %d\n", users[i].identifiant);
+        printf("user role : %d\n", users[i].role);
+        printf("mot de passe : %s\n", users[i].password);
+        printf("***************************************\n");
+    }
+}
+//Partie 2 : Fonctions de gestions des Reclamations
+void creer_reclamation(){
+    if (reclamation_count > MAX_RECLAMATION){
+        printf("impossible de creer une reclamation pour le moment.\n");
+    }
+    else {
+        strcpy(reclamations[reclamation_count].status, "en cours");
+        reclamations[reclamation_count].ID = reclamation_count + 1;
+        printf("motif : ");
+        fgets(reclamations[reclamation_count].motif, 30, stdin);
+        reclamations[reclamation_count].motif[strcspn(reclamations[reclamation_count].motif, "\n")] = '\0';
+        printf("description : ");
+        fgets(reclamations[reclamation_count].description, 200, stdin);
+        reclamations[reclamation_count].description[strcspn(reclamations[reclamation_count].description, "\n")] = '\0';
+        printf("categorie : ");
+        fgets(reclamations[reclamation_count].categorie, 30, stdin);
+        reclamations[reclamation_count].categorie[strcspn(reclamations[reclamation_count].categorie, "\n")] = '\0';
+        time_t date = time(NULL);
+        strcpy(reclamations[reclamation_count].date, ctime(&date));
+         printf("reclamation numero %d a ete bien creer.\n", reclamation_count);
+        reclamation_count++;
+    }
+}
 //admin menu
 void admin_menu(){
     int choix_admin;
     do{
         printf("\n========== Admin menu ==========\n");
-        printf("1.  gestion des utilisateurs.\n");
-        printf("2.  gestion des reclamations.\n");
-        printf("3.  generation des statistiques.\n");
+        printf("1.  Changer le role d'un utilisateur.\n");
+        printf("2.  afficher la liste des utilisateurs.\n");
+        printf("3.  gestion des reclamations.\n");
+        printf("4.  generation des statistiques.\n");
         printf("0.  Revenue au menu principale.\n");
         printf("Choisit l'opperation : ");
         scanf("%d", &choix_admin);
@@ -195,8 +243,7 @@ void admin_menu(){
                 gerer_role();
                 break;
             case 2:
-                //gestion_reclamation();
-                printf("1");
+                list_users();
                 break;
             case 3:
                 //statistique();
@@ -247,7 +294,7 @@ void client_menu() {
         getchar();
         switch (client_option) {
             case 1:
-                //creer_reclamation();
+                creer_reclamation();
                 printf("1.\n");
                 break;
             case 2:
@@ -257,6 +304,7 @@ void client_menu() {
         }
     } while (client_option != 0);
 }
+
 int main() {
     int choix;
     admin();  
