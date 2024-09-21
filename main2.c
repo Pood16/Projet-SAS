@@ -1,0 +1,265 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX_USERS 100
+//declaration des fonctions
+void admin();
+void creer_compte();
+int password_check(char pass[], char name[]);
+void admin_menu();
+void agent_menu();
+void client_menu();
+int user_role(int index);
+void menu_role(int userIndex);
+//global variables et initialisation
+int user_count = 1;
+//user structure
+typedef struct {
+    char fullName[50];
+    int role;
+    char password[50];
+    int identifiant;
+}User;
+User users[MAX_USERS];
+//Creer un admin
+void admin(){
+    strcpy(users[0].fullName, "admin");
+    users[0].role=0;
+    strcpy(users[0].password, "Admin@2024");
+    users[0].identifiant = 0;
+}
+//creer un compte
+void creer_compte(){
+    //verifier qu il ya encore d'espace
+    if (user_count > MAX_USERS){
+        printf("impossible de creer le compte!\n");
+        printf("Le maximum des clienrs est atteinte.\n");
+    }
+    User client;
+    int valid = 0;
+    client.role = 2;
+    client.identifiant = user_count;
+    printf("Entrer les informations suivantes : \n");
+    //saisir le nom complet de client
+    printf("nom et prenom : ");
+    fgets(client.fullName, 50, stdin);
+    client.fullName[strcspn(client.fullName, "\n")] = '\0';
+    while(1){
+        //saisir le mot de passe de client
+        printf("password : ");
+        fgets(client.password, 50, stdin);
+        client.password[strcspn(client.password, "\n")] = '\0';
+        //Verifier si le mot de passe recpecte les conditions
+        int status = password_check(client.password, client.fullName);
+        if (status){
+            valid = 1;
+            break;
+        }
+        else {
+            printf("\n........... Attention : \n");
+            printf("Le mot de passe doit contenir au moins 8 caracteres : \n");
+            printf("Un caractere majuscule, minuscule, chiffre et un caractere special (par exemple : !@#$%^&*)\n");
+            printf("Il ne doit pas contenir votre nom.\n");
+            printf("Veuillez essayer a nouveau.\n");
+            printf("....................................\n");
+        }
+
+    }
+    if (valid){
+        users[user_count] = client;
+        printf("Compte est creer avec l'identifiant : %d\n", user_count);
+        //test
+        printf("identifiant : %d\n", users[user_count].identifiant);
+        printf("password : %s\n", users[user_count].password);
+        printf("role : %d\n", users[user_count].role);
+        //fin test
+        user_count++;
+    }
+    
+
+}
+//verifier le mot de passe
+int password_check(char pass[], char name[]){
+    int majiscule, miniscule, chiffre, caractere;
+    majiscule = miniscule = chiffre = caractere = 0;
+    if (strlen(pass) < 8){
+        return 0;
+    }
+    if (strstr(pass, name) != NULL){
+        return 0;
+    }
+    for (int i=0; i<strlen(pass); i++){
+        if (pass[i] >= 'A' && pass[i] <= 'Z') {
+                majiscule = 1;    
+        }
+        else if (pass[i] >= 'a' && pass[i] <= 'z') {
+                miniscule = 1;
+        }
+        else if ((pass[i] >= 33 && pass[i] <= 47) || (pass[i] >= 58 && pass[i] <= 64) || (pass[i] >= 91 && pass[i] <= 96) || (pass[i] >= 123 && pass[i] <= 126)) {
+                caractere = 1;
+        } 
+        else if (pass[i] >= '0' && pass[i] <= '9') {  // Fix for digit
+                chiffre = 1;
+        }         
+    }
+    if (majiscule && miniscule && caractere && chiffre){
+        return 1;
+    }
+}
+
+//Fonction de connexion
+void connecter_vous(){
+    char pass[50];
+    int id, index = -1, exist = 0;
+    printf("identifiant : ");
+    scanf("%d", &id);
+    getchar();
+    printf("mot de passe : ");
+    fgets(pass, 50, stdin);
+    pass[strcspn(pass, "\n")] = '\0';
+    //check if the client is exist
+    for (int i=0; i<user_count; i++){
+        if (users[i].identifiant == id && strcmp(pass, users[i].password) == 0){
+            exist = 1;
+            index = i;
+            printf("role : %d\n", users[i].role);
+        }
+        else {
+            printf("salam!\n");
+        }
+    }
+    if (exist){
+       menu_role(users[index].role);
+    } 
+}
+//fonction pour determiner le role de l'utilisateur
+int user_role(int userIndex){
+    if (users[userIndex].role == 0){
+        return 0;//admine
+    }
+    if (users[userIndex].role == 1){
+        return 1;//agent de reclamation
+    }
+    if (users[userIndex].role == 2){
+        return 2;//client
+    }
+}
+void menu_role(int userIndex){
+    if (userIndex == 0){
+        admin_menu();
+    }
+    else if (userIndex == 1){
+        agent_menu();
+    }
+    else if (userIndex == 2){
+        client_menu();
+    }
+}
+//admin menu
+void admin_menu(){
+    int choix_admin;
+    do{
+        printf("\n========== Admin menu ==========\n");
+        printf("1.  gestion des utilisateurs.\n");
+        printf("2.  gestion des reclamations.\n");
+        printf("3.  generation des statistiques.\n");
+        printf("0.  Revenue au menu principale.\n");
+        printf("Choisit l'opperation : ");
+        scanf("%d", &choix_admin);
+        getchar();
+        switch (choix_admin){
+            case 1:
+                printf("role()\n");
+                break;
+            case 2:
+                //gestion_reclamation();
+                printf("1");
+                break;
+            case 3:
+                //statistique();
+                printf("2");
+                break;
+        }
+    }while (choix_admin != 0);
+
+}
+//agent de reclamation menu
+void agent_menu(){
+    int choix_agent;
+      do {
+        printf("\n========== Agent Menu ==========\n");
+        printf("1. Afficher toute les reclamations\n");
+        printf("2. Traiter la reclamation\n");
+        printf("0. deconnexion\n");
+        printf("veuillez entrer votre choice: ");
+        scanf("%d", &choix_agent);
+        printf("\n*************************\n\n");
+        getchar();
+
+        switch (choix_agent) {
+            case 1:
+                printf("traitement");
+                break;
+            case 2:
+                printf("traitement\n");
+                break;
+            case 0:
+                printf("deconnexion ...\n");
+                break;
+            default:
+                printf("invalid choice. essayer a nouveau\n");
+        }
+    } while (choix_agent != 0);
+}
+//menu de client
+void client_menu() {
+    int client_option;
+    do {
+        printf("\n========== Client menu ==========\n");
+        printf("[1].    Ajouter une reclamation.\n");
+        printf("[2].    Modifier une reclamation.\n");
+        printf("[3].    Supprimer une reclamation.\n");
+        printf("veillez saisir votre choix: ");
+        scanf("%d", &client_option);
+        getchar();
+        switch (client_option) {
+            case 1:
+                //creer_reclamation();
+                printf("1.\n");
+                break;
+            case 2:
+                //afficher_reclamation();
+                printf("1.\n");
+                break;
+        }
+    } while (client_option != 0);
+}
+int main() {
+    int choix;
+    admin();  
+    do {
+        printf("\n===== Bienvenue Sur votre application de gestion de vos reclamations =======\n");
+        printf("[1].    Nouveau client.\n");
+        printf("[2].    Se connecter.\n");
+        printf("[0].    Quitter.\n");
+        printf("============================================================================\n");
+        printf("Entrer votre choix : ");
+        scanf("%d", &choix);
+        getchar();  
+        switch (choix) {
+            case 1:
+                creer_compte();
+                break;
+            case 2:
+                connecter_vous();
+                break;
+            case 0:
+                break;
+            default:
+                printf("Choix non valide!.\n");
+                break;
+        }
+    } while (choix != 0);
+
+    return 0;
+}
