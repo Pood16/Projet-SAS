@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h> 
 #define MAX_USERS 100
 //declaration des fonctions
 void admin();
@@ -11,6 +12,7 @@ void agent_menu();
 void client_menu();
 int user_role(int index);
 void menu_role(int userIndex);
+//void menu_gestion();
 //global variables et initialisation
 int user_count = 1;
 //user structure
@@ -68,15 +70,13 @@ void creer_compte(){
     if (valid){
         users[user_count] = client;
         printf("Compte est creer avec l'identifiant : %d\n", user_count);
-        //test
-        printf("identifiant : %d\n", users[user_count].identifiant);
-        printf("password : %s\n", users[user_count].password);
-        printf("role : %d\n", users[user_count].role);
-        //fin test
+        // test
+        // printf("identifiant : %d\n", users[user_count].identifiant);
+        // printf("password : %s\n", users[user_count].password);
+        // printf("role : %d\n", users[user_count].role);
+        // fin test
         user_count++;
     }
-    
-
 }
 //verifier le mot de passe
 int password_check(char pass[], char name[]){
@@ -106,32 +106,39 @@ int password_check(char pass[], char name[]){
         return 1;
     }
 }
-
 //Fonction de connexion
-void connecter_vous(){
+void connecter_vous() {
     char pass[50];
-    int id, index = -1, exist = 0;
-    printf("identifiant : ");
-    scanf("%d", &id);
-    getchar();
-    printf("mot de passe : ");
-    fgets(pass, 50, stdin);
-    pass[strcspn(pass, "\n")] = '\0';
-    //check if the client is exist
-    for (int i=0; i<user_count; i++){
-        if (users[i].identifiant == id && strcmp(pass, users[i].password) == 0){
-            exist = 1;
-            index = i;
-            printf("role : %d\n", users[i].role);
+    int id, index = -1, exist = 0, tentative = 0;
+    while (tentative < 3) {  
+        printf("identifiant : ");
+        scanf("%d", &id);
+        getchar();  
+        printf("mot de passe : ");
+        fgets(pass, 50, stdin);
+        pass[strcspn(pass, "\n")] = '\0';  
+        for (int i = 0; i < user_count; i++) {
+            if (users[i].identifiant == id && strcmp(pass, users[i].password) == 0) {
+                exist = 1;
+                index = i;
+                break;  
+            }
         }
-        else {
-            printf("salam!\n");
+        if (exist) {
+            menu_role(users[index].role);
+            return;  
+        } else {
+            tentative++;  
+            printf("Identifiant ou mot de passe incorrect. Tentatives restantes : %d\n", 3 - tentative);
         }
     }
-    if (exist){
-       menu_role(users[index].role);
-    } 
+    if (tentative == 3) {
+        printf("3 tentatives de connexion échouées. Veuillez réessayer après 10 secondes.\n");
+        sleep(10);  
+    }
+    connecter_vous();  
 }
+
 //fonction pour determiner le role de l'utilisateur
 int user_role(int userIndex){
     if (users[userIndex].role == 0){
@@ -155,6 +162,22 @@ void menu_role(int userIndex){
         client_menu();
     }
 }
+void gerer_role(){
+    int id, newRole;
+    printf("Entrer l'identifiant de l'utilisateur a modifier : ");
+    scanf("%d", &id);
+    printf("Entrer le nouveau role pour cet utilisateur :\n");
+    printf("0 pour un admin.\n");
+    printf("1 pour un agent des reclamations.\n");
+    printf("2 pour un client.\n");
+    scanf("%d", &newRole);
+    for (int i=0; i<user_count; i++){
+        if (users[i].identifiant == id){
+            users[i].role = newRole;
+        }
+    }
+    printf("Le role est bien changer.\n");
+}
 //admin menu
 void admin_menu(){
     int choix_admin;
@@ -169,7 +192,7 @@ void admin_menu(){
         getchar();
         switch (choix_admin){
             case 1:
-                printf("role()\n");
+                gerer_role();
                 break;
             case 2:
                 //gestion_reclamation();
