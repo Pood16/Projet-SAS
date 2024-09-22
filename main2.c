@@ -211,14 +211,15 @@ void list_users(){
     
 }
 //Partie 2 : Fonctions de gestions des Reclamations
+int nouveau_reclamation = 1;
 void creer_reclamation(){
     if (reclamation_count > MAX_RECLAMATION){
         printf("impossible de creer une reclamation pour le moment.\n");
     }
     else {
-
         strcpy(reclamations[reclamation_count].status, "en cours");
-        reclamations[reclamation_count].ID = reclamation_count + 1;
+        reclamations[reclamation_count].ID = nouveau_reclamation;
+        nouveau_reclamation++;
         printf("Entrer votre identifiat : ");
         scanf("%d", &reclamations[reclamation_count].user_identifiant);
         getchar();
@@ -242,9 +243,9 @@ void afficher_reclamation(){
         printf("pas de  reclamation!\n");
     }
     else{
-            int index_identifiant = -1;
+            int index_identifiant;
             printf("*********************\n");
-            printf("    >> liste des reclamations : \n");
+            printf("    >>      liste des reclamations : \n");
                 for (int i=0; i<reclamation_count; i++){
                     for (int j=0; j<user_count; j++){
                         if (reclamations[i].user_identifiant == users[j].identifiant){
@@ -305,7 +306,7 @@ void modifier_reclamation(){
 }
 void supprimer_reclamation(){
     int id_spprimer;
-    int index_supprimer = -1;
+    int index_supprimer;
     printf("Entrer ID de reclamtion a supprimer : ");
     scanf("%d", &id_spprimer);
     for (int i=0; i<reclamation_count; i++){
@@ -319,10 +320,10 @@ void supprimer_reclamation(){
     }
     else if (users[index_supprimer].role == 0 || users[index_supprimer].role == 1 || (users[index_supprimer].role == 2 && (reclamations[index_supprimer].ID == users[index_supprimer].identifiant))){
         for (int i= index_supprimer; i<reclamation_count -1 ; i++){
-            reclamations[i] = reclamations[i - 1];
+            reclamations[i] = reclamations[i+1];
         }
         reclamation_count--;
-        printf("Reclamation avec id %d est bien supprimer.\n", index_supprimer);
+        printf("Reclamation est bien supprimer.\n");
     }
     else {
         printf("Impossible de supprimer cette reclamation.\n");
