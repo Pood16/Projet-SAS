@@ -339,7 +339,6 @@ void agent_menu(){
                 modifier_reclamation();
                 break;
             case 0:
-                printf("deconnexion ...\n");
                 break;
             default:
                 printf("invalid choice. essayer a nouveau\n");
@@ -354,6 +353,7 @@ void client_menu() {
         printf("[1].    Ajouter une reclamation.\n");
         printf("[2].    Modifier une reclamation.\n");
         printf("[3].    Supprimer une reclamation.\n");
+        printf("[0].    Quiter menu.\n");
         printf("veillez saisir votre choix: ");
         scanf("%d", &client_option);
         getchar();
