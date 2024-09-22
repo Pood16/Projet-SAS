@@ -36,6 +36,7 @@ void admin(){
 //structure des reclamations
 typedef struct{
     int ID;
+    int user_identifiant;
     char motif[30];
     char description[200];
     char categorie[30];
@@ -146,7 +147,7 @@ void connecter_vous() {
         }
     }
     if (tentative == 3) {
-        printf("3 tentatives de connexion échouées. Veuillez réessayer après 10 secondes.\n");
+        printf("3 tentatives de connexion echouees. Veuillez ressayer apres 10 secondes.\n");
         sleep(10);  
     }
     connecter_vous();  
@@ -215,8 +216,12 @@ void creer_reclamation(){
         printf("impossible de creer une reclamation pour le moment.\n");
     }
     else {
+
         strcpy(reclamations[reclamation_count].status, "en cours");
         reclamations[reclamation_count].ID = reclamation_count + 1;
+        printf("Entrer votre identifiat : ");
+        scanf("%d", &reclamations[reclamation_count].user_identifiant);
+        getchar();
         printf("motif : ");
         fgets(reclamations[reclamation_count].motif, 30, stdin);
         reclamations[reclamation_count].motif[strcspn(reclamations[reclamation_count].motif, "\n")] = '\0';
@@ -236,23 +241,30 @@ void afficher_reclamation(){
     if (reclamation_count == 0){
         printf("pas de  reclamation!\n");
     }
-    else {
-        printf(" ==== liste des reclamations : \n");
-        for (int i=0; i<reclamation_count; i++){
-        printf("client : %s\n", users[i+1].fullName);
-        printf("reclamation ID: %d\n", reclamations[i].ID);
-        printf("motif : %s\n", reclamations[i].motif);
-        printf("categorie : %s\n", reclamations[i].categorie);
-        printf("Description : %s\n", reclamations[i].description);
-        printf("status de reclamation : %s\n", reclamations[i].status);
-        printf("date : %s\n",reclamations[i].date );
-    }
-    }
-    
+    else{
+            int index_identifiant = -1;
+            printf(" ==== liste des reclamations : \n");
+                for (int i=0; i<reclamation_count; i++){
+                    for (int j=0; j<user_count; j++){
+                        if (reclamations[i].user_identifiant == users[j].identifiant){
+                            index_identifiant = j;
+                    }
+                }
+            
+            printf("client : %s\n", users[index_identifiant].fullName);
+            printf("reclamation ID: %d\n", reclamations[i].ID);
+            printf("motif : %s\n", reclamations[i].motif);
+            printf("categorie : %s\n", reclamations[i].categorie);
+            printf("Description : %s\n", reclamations[i].description);
+            printf("status de reclamation : %s\n", reclamations[i].status);
+            printf("date : %s\n",reclamations[i].date );
+        }
+    }  
 }
+
 void modifier_reclamation(){
     int id_reclamation;
-    int index_reclamation;
+    int index_reclamation = -1;
     //verifier si la reclamation existe
     if (reclamation_count == 0){
         printf("opperation impossible : Pas de reclamation.\n");
