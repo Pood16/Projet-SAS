@@ -269,11 +269,11 @@ void modifier_reclamation(){
         }
     }
     //exit si la reclamation n'existe pas
-    if (index_reclamation == -1){
-        printf("Pas de reclamation avec cet ID.\n");
+    if(index_reclamation < 0 || index_reclamation > reclamation_count){
+        printf("reclamation avec cet ID n'existe pas pour le moment.\n");
         return;
     }
-    if (users[index_reclamation].role == 0 || users[index_reclamation].role == 1 || users[index_reclamation].role == 2 && (reclamations[index_reclamation].ID == users[index_reclamation].identifiant)){
+    else if (users[index_reclamation].role == 0 || users[index_reclamation].role == 1 || users[index_reclamation].role == 2 && (reclamations[index_reclamation].ID == users[index_reclamation].identifiant)){
            printf("nouveau motif : ");
            fgets(reclamations[index_reclamation].motif, 30, stdin);
            reclamations[index_reclamation].motif[strcspn(reclamations[index_reclamation].motif, "\n")] = '\0';
@@ -285,6 +285,37 @@ void modifier_reclamation(){
            reclamations[index_reclamation].description[strcspn(reclamations[index_reclamation].description, "\n")] = '\0';
            printf("Reclamtion est bien modifier.\n");
         }
+    else {
+        printf("Impossible de modifier cette reclamation.\n");
+        return;
+    }
+}
+void supprimer_reclamation(){
+    int id_spprimer;
+    int index_supprimer = -1;
+    printf("Entrer ID de reclamtion a supprimer : ");
+    scanf("%d", &id_spprimer);
+    for (int i=0; i<reclamation_count; i++){
+        if (id_spprimer == reclamations[i].ID){
+            index_supprimer = i;
+        }
+    }
+    if(index_supprimer < 0 || index_supprimer > reclamation_count){
+        printf("reclamation avec cet ID n'existe pas pour le moment.\n");
+        return;
+    }
+    else if (users[index_supprimer].role == 0 || users[index_supprimer].role == 1 || users[index_supprimer].role == 2 && (reclamations[index_supprimer].ID == users[index_supprimer].identifiant)){
+        for (int i= index_supprimer; i<reclamation_count -1 ; i++){
+            reclamations[i - 1] = reclamations[i];
+        }
+        reclamation_count--;
+        printf("Reclamation avec id %d est bien supprimer.\n", index_supprimer);
+    }
+    else {
+        printf("Impossible de supprimer cette reclamation.\n");
+        return;
+    }
+    
 }
 //admin menu
 void admin_menu(){
@@ -295,6 +326,7 @@ void admin_menu(){
         printf("2.  afficher la liste des utilisateurs.\n");
         printf("3.  afficher liste des reclamations.\n");
         printf("4.  modifier des reclamations.\n");
+        printf("5.  supprimer reclamation.\n");
         printf("0.  Revenue au menu principale.\n");
         printf("Choisit l'opperation : ");
         scanf("%d", &choix_admin);
@@ -312,7 +344,13 @@ void admin_menu(){
             case 4:
                 modifier_reclamation();
                 break;
+            case 5:
+                supprimer_reclamation();
+                break;
             case 0:
+                break;
+            default:
+                printf("choix invalide!\n");
                 break;
         }
     }while (choix_admin != 0);
@@ -324,7 +362,8 @@ void agent_menu(){
       do {
         printf("\n========== Agent Menu ==========\n");
         printf("1. Afficher toute les reclamations\n");
-        printf("2. Traiter la reclamation\n");
+        printf("2. Modifier reclamation\n");
+        printf("3. Supprimer une reclamation.\n");
         printf("0. deconnexion\n");
         printf("veuillez entrer votre choice: ");
         scanf("%d", &choix_agent);
@@ -338,10 +377,14 @@ void agent_menu(){
             case 2:
                 modifier_reclamation();
                 break;
+            case 3:
+                supprimer_reclamation();
+                break;
             case 0:
                 break;
             default:
                 printf("invalid choice. essayer a nouveau\n");
+                break;
         }
     } while (choix_agent != 0);
 }
@@ -363,6 +406,14 @@ void client_menu() {
                 break;
             case 2:
                 modifier_reclamation();
+                break;
+            case 3: 
+                supprimer_reclamation();
+                break;
+            case 0:
+                break; 
+            default :
+                printf("choix invalide!\n");
                 break;
         }
     } while (client_option != 0);
