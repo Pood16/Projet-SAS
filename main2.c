@@ -225,6 +225,16 @@ void creer_reclamation(){
         reclamation_count++;
     }
 }
+void afficher_reclamation(){
+    for (int i=0; i<reclamation_count; i++){
+        printf("client : %s\n", users[i+1].fullName);
+        printf("motif : %s\n", reclamations[i].motif);
+        printf("categorie : %s\n", reclamations[i].categorie);
+        printf("Description : %s\n", reclamations[i].description);
+        printf("status de reclamation : %s\n", reclamations[i].status);
+        printf("date : %s",reclamations[i].date );
+    }
+}
 //admin menu
 void admin_menu(){
     int choix_admin;
@@ -232,7 +242,7 @@ void admin_menu(){
         printf("\n========== Admin menu ==========\n");
         printf("1.  Changer le role d'un utilisateur.\n");
         printf("2.  afficher la liste des utilisateurs.\n");
-        printf("3.  gestion des reclamations.\n");
+        printf("3.  afficher liste des reclamations.\n");
         printf("4.  generation des statistiques.\n");
         printf("0.  Revenue au menu principale.\n");
         printf("Choisit l'opperation : ");
@@ -246,8 +256,7 @@ void admin_menu(){
                 list_users();
                 break;
             case 3:
-                //statistique();
-                printf("2");
+                afficher_reclamation();
                 break;
         }
     }while (choix_admin != 0);
@@ -268,7 +277,7 @@ void agent_menu(){
 
         switch (choix_agent) {
             case 1:
-                printf("traitement");
+                afficher_reclamation();
                 break;
             case 2:
                 printf("traitement\n");
@@ -295,11 +304,9 @@ void client_menu() {
         switch (client_option) {
             case 1:
                 creer_reclamation();
-                printf("1.\n");
                 break;
             case 2:
-                //afficher_reclamation();
-                printf("1.\n");
+                printf("1\n");
                 break;
         }
     } while (client_option != 0);
