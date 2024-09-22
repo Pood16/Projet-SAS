@@ -192,7 +192,12 @@ void gerer_role(){
     printf("Le role est bien changer.\n");
 }
 void list_users(){
-    for (int i=0; i<user_count; i++){
+    if (user_count == 0){
+        printf("Pas d'utilisateurs!.\n");
+    }
+    else {
+        printf("======= Liste des utilisateurs : \n");
+        for (int i=0; i<user_count; i++){
         printf("***************************************\n");
         printf("informations de l'utilisateur %d : \n", i+1);
         printf("nom complet : %s\n", users[i].fullName);
@@ -201,6 +206,8 @@ void list_users(){
         printf("mot de passe : %s\n", users[i].password);
         printf("***************************************\n");
     }
+    }
+    
 }
 //Partie 2 : Fonctions de gestions des Reclamations
 void creer_reclamation(){
@@ -221,19 +228,63 @@ void creer_reclamation(){
         reclamations[reclamation_count].categorie[strcspn(reclamations[reclamation_count].categorie, "\n")] = '\0';
         time_t date = time(NULL);
         strcpy(reclamations[reclamation_count].date, ctime(&date));
-         printf("reclamation numero %d a ete bien creer.\n", reclamation_count);
+        printf("reclamation numero %d a ete bien creer avec un ID %d.\n", reclamation_count + 1, reclamations[reclamation_count].ID);
         reclamation_count++;
     }
 }
 void afficher_reclamation(){
-    for (int i=0; i<reclamation_count; i++){
+    if (reclamation_count == 0){
+        printf("pas de  reclamation!\n");
+    }
+    else {
+        printf(" ==== liste des reclamations : \n");
+        for (int i=0; i<reclamation_count; i++){
         printf("client : %s\n", users[i+1].fullName);
+        printf("reclamation ID: %d\n", reclamations[i].ID);
         printf("motif : %s\n", reclamations[i].motif);
         printf("categorie : %s\n", reclamations[i].categorie);
         printf("Description : %s\n", reclamations[i].description);
         printf("status de reclamation : %s\n", reclamations[i].status);
-        printf("date : %s",reclamations[i].date );
+        printf("date : %s\n",reclamations[i].date );
     }
+    }
+    
+}
+void modifier_reclamation(){
+    int id_reclamation;
+    int index_reclamation;
+    //verifier si la reclamation existe
+    if (reclamation_count == 0){
+        printf("opperation impossible : Pas de reclamation.\n");
+        return;
+    }
+    //cherche la position de reclamation
+    printf("Entrer  ID de reclamation a modifier : ");
+    scanf("%d", &id_reclamation);
+    getchar();
+    for (int i=0; i<reclamation_count; i++){
+        if (id_reclamation == reclamations[i].ID){
+            index_reclamation = i;
+            break;
+        }
+    }
+    //exit si la reclamation n'existe pas
+    if (index_reclamation == -1){
+        printf("Pas de reclamation avec cet ID.\n");
+        return;
+    }
+    if (users[index_reclamation].role == 0 || users[index_reclamation].role == 1 || users[index_reclamation].role == 2 && (reclamations[index_reclamation].ID == users[index_reclamation].identifiant)){
+           printf("nouveau motif : ");
+           fgets(reclamations[index_reclamation].motif, 30, stdin);
+           reclamations[index_reclamation].motif[strcspn(reclamations[index_reclamation].motif, "\n")] = '\0';
+           printf("nouveau description : ");
+           fgets(reclamations[index_reclamation].description, 200, stdin);
+           reclamations[index_reclamation].description[strcspn(reclamations[index_reclamation].description, "\n")] = '\0';
+           printf("categorie : ");
+           fgets(reclamations[index_reclamation].categorie, 30, stdin);
+           reclamations[index_reclamation].description[strcspn(reclamations[index_reclamation].description, "\n")] = '\0';
+           printf("Reclamtion est bien modifier.\n");
+        }
 }
 //admin menu
 void admin_menu(){
@@ -243,7 +294,7 @@ void admin_menu(){
         printf("1.  Changer le role d'un utilisateur.\n");
         printf("2.  afficher la liste des utilisateurs.\n");
         printf("3.  afficher liste des reclamations.\n");
-        printf("4.  generation des statistiques.\n");
+        printf("4.  modifier des reclamations.\n");
         printf("0.  Revenue au menu principale.\n");
         printf("Choisit l'opperation : ");
         scanf("%d", &choix_admin);
@@ -257,6 +308,11 @@ void admin_menu(){
                 break;
             case 3:
                 afficher_reclamation();
+                break;
+            case 4:
+                modifier_reclamation();
+                break;
+            case 0:
                 break;
         }
     }while (choix_admin != 0);
@@ -280,7 +336,7 @@ void agent_menu(){
                 afficher_reclamation();
                 break;
             case 2:
-                printf("traitement\n");
+                modifier_reclamation();
                 break;
             case 0:
                 printf("deconnexion ...\n");
@@ -306,7 +362,7 @@ void client_menu() {
                 creer_reclamation();
                 break;
             case 2:
-                printf("1\n");
+                modifier_reclamation();
                 break;
         }
     } while (client_option != 0);
