@@ -317,9 +317,9 @@ void supprimer_reclamation(){
         printf("reclamation avec cet ID n'existe pas pour le moment.\n");
         return;
     }
-    else if (users[index_supprimer].role == 0 || users[index_supprimer].role == 1 || users[index_supprimer].role == 2 && (reclamations[index_supprimer].ID == users[index_supprimer].identifiant)){
+    else if (users[index_supprimer].role == 0 || users[index_supprimer].role == 1 || (users[index_supprimer].role == 2 && (reclamations[index_supprimer].ID == users[index_supprimer].identifiant))){
         for (int i= index_supprimer; i<reclamation_count -1 ; i++){
-            reclamations[i - 1] = reclamations[i];
+            reclamations[i] = reclamations[i - 1];
         }
         reclamation_count--;
         printf("Reclamation avec id %d est bien supprimer.\n", index_supprimer);
@@ -352,7 +352,10 @@ void traiter_reclamation(){
         return;
     }
     else {
-        printf("Entrer le nouveau status : ");
+        printf("choisit le nouveau status : \n");
+        printf("    en cours.\n");
+        printf("    resolue.\n");
+        printf("    fermee.\n");
         fgets(reclamations[index_traiter].status, 30, stdin);
         reclamations[index_traiter].status[strcspn(reclamations[index_traiter].status, "\n")] = '\0';
         printf("status et bien traiter.\n");
