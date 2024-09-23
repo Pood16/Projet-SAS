@@ -47,6 +47,8 @@ typedef struct{
     char status[30];
     char date[30];
     time_t datE;
+    char prioriter[30];
+    int ordre_prioriter;
 }Reclamation;
 Reclamation reclamations[MAX_RECLAMATION];
 //creer un compte
@@ -240,6 +242,21 @@ void creer_reclamation(){
         reclamations[reclamation_count].datE = time(NULL);
         strcpy(reclamations[reclamation_count].date, ctime(&Date));
         printf("reclamation numero %d a ete bien creer avec un ID %d.\n", nouveau_reclamation, nouveau_reclamation);
+        //introduire la prioriter
+        if (strstr(reclamations[reclamation_count].description, "critique") != NULL){
+            strcpy(reclamations[reclamation_count].prioriter, "Haute");
+            reclamations[reclamation_count].ordre_prioriter = 0;
+        }
+        else if (strstr(reclamations[reclamation_count].description, "regulier") != NULL){
+            strcpy(reclamations[reclamation_count].prioriter, "moyenne");
+            reclamations[reclamation_count].ordre_prioriter = 1;
+        
+        }
+        else {
+            strcpy(reclamations[reclamation_count].prioriter, "basse");
+            reclamations[reclamation_count].ordre_prioriter = 2;
+
+        }
         nouveau_reclamation++;
         reclamation_count++;
     }
@@ -266,6 +283,8 @@ void afficher_reclamation(){
                 printf("Description : %s\n", reclamations[i].description);
                 printf("status de reclamation : %s\n", reclamations[i].status);
                 printf("date : %s\n",reclamations[i].date );
+                printf("status de priorite : %s\n", reclamations[i].prioriter);
+                printf("ordre de priorite : %d\n", reclamations[i].ordre_prioriter);
         }
     }  
 }
