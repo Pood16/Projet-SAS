@@ -46,6 +46,7 @@ typedef struct{
     char categorie[30];
     char status[30];
     char date[30];
+    time_t datE;
 }Reclamation;
 Reclamation reclamations[MAX_RECLAMATION];
 //creer un compte
@@ -223,7 +224,6 @@ void creer_reclamation(){
     else {
         strcpy(reclamations[reclamation_count].status, "en cours");
         reclamations[reclamation_count].ID = nouveau_reclamation;
-        nouveau_reclamation++;
         printf("Entrer votre identifiat : ");
         scanf("%d", &reclamations[reclamation_count].user_identifiant);
         getchar();
@@ -237,8 +237,10 @@ void creer_reclamation(){
         fgets(reclamations[reclamation_count].categorie, 30, stdin);
         reclamations[reclamation_count].categorie[strcspn(reclamations[reclamation_count].categorie, "\n")] = '\0';
         time_t Date = time(NULL);
+        reclamations[reclamation_count].datE = time(NULL);
         strcpy(reclamations[reclamation_count].date, ctime(&Date));
         printf("reclamation numero %d a ete bien creer avec un ID %d.\n", nouveau_reclamation, nouveau_reclamation);
+        nouveau_reclamation++;
         reclamation_count++;
     }
 }
@@ -269,6 +271,7 @@ void afficher_reclamation(){
 }
 
 void modifier_reclamation(){
+    time_t modification_time = time(NULL);
     int id_reclamation;
     int index_reclamation = -1;
     //verifier si la reclamation existe
@@ -291,7 +294,7 @@ void modifier_reclamation(){
         printf("reclamation avec cet ID n'existe pas pour le moment.\n");
         return;
     }
-    else if (users[index_reclamation].role == 0 || users[index_reclamation].role == 1 || users[index_reclamation].role == 2 && (reclamations[index_reclamation].ID == users[index_reclamation].identifiant)){
+    else if (users[index_reclamation].role == 0 || users[index_reclamation].role == 1 || users[index_reclamation].role == 2 && (reclamations[index_reclamation].ID == users[index_reclamation].identifiant && difftime(modification_time, reclamations[index_reclamation].datE) < 24 * 3600)){
            printf("*************************************************\n");
            printf("nouveau motif : ");
            fgets(reclamations[index_reclamation].motif, 30, stdin);
@@ -386,8 +389,7 @@ void chercher_reclamation(){
             recherche_nom();
             break;
         case 3:
-            //recherche_status();
-            printf("test\n");
+            recherche_status();
             break;
         
 
@@ -399,22 +401,32 @@ void chercher_reclamation(){
 }
 void recherche_identifiant(){
     int indice;
-    int indice_chercher;
+    int indice_chercher = -1;
     printf("Entrer ID du reclamation chercher : ");
     scanf("%d", &indice);
     getchar();
-    if( indice > nouveau_reclamation){
-        printf("Pas de reclamation avec cette ID.\n");
-    }
-    else {
+    // if( indice > nouveau_reclamation){
+    //     printf("Pas de reclamation avec cette ID.\n");
+    // }
+    // else {
+    //     for (int i=0; i<reclamation_count; i++){
+    //         if(indice == reclamations[i].ID){
+    //             indice_chercher = i;
+    //         }
+    //     }
+
+    
         for (int i=0; i<reclamation_count; i++){
             if(indice == reclamations[i].ID){
                 indice_chercher = i;
             }
         }
 
-    } 
-    for (int i=0; i<reclamation_count; i++){
+    if (indice_chercher == -1){
+        printf("Pas de reclamation avec cette ID.\n");
+    }
+    else {
+        for (int i=0; i<reclamation_count; i++){
             if(reclamations[i].user_identifiant == users[indice_chercher].identifiant){
                 printf("*********************************************\n");
                 printf("Reclamation rechercher : \n");
@@ -426,10 +438,9 @@ void recherche_identifiant(){
                 printf("status de reclamation : %s\n", reclamations[i].status);
                 printf("date : %s\n",reclamations[i].date );
                 printf("*********************************************\n");
-        
+            }
         }
-
-}
+    }
 }
 void recherche_nom(){
     char client_nom[30];
