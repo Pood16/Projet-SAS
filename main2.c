@@ -16,6 +16,7 @@ int user_role(int index);
 void menu_role(int userIndex);
 int recherche_date();
 int recherche_status();
+void recherche_nom();
 int recherche_identifiant();
 //void menu_gestion();
 //global variables et initialisation
@@ -23,7 +24,7 @@ int user_count = 1;
 int reclamation_count = 0;
 //user structure
 typedef struct {
-    char fullName[50];
+    char nom[50];
     int role;
     char password[50];
     int identifiant;
@@ -31,7 +32,7 @@ typedef struct {
 User users[MAX_USERS];
 //Creer un admin
 void admin(){
-    strcpy(users[0].fullName, "admin");
+    strcpy(users[0].nom, "admin");
     users[0].role=0;
     strcpy(users[0].password, "Admin@2024");
     users[0].identifiant = 0;
@@ -60,16 +61,16 @@ void creer_compte(){
     client.identifiant = user_count;
     printf("Entrer les informations suivantes : \n");
     //saisir le nom complet de client
-    printf("nom et prenom : ");
-    fgets(client.fullName, 50, stdin);
-    client.fullName[strcspn(client.fullName, "\n")] = '\0';
+    printf("nom : ");
+    fgets(client.nom, 50, stdin);
+    client.nom[strcspn(client.nom, "\n")] = '\0';
     while(1){
         //saisir le mot de passe de client
         printf("password : ");
         fgets(client.password, 50, stdin);
         client.password[strcspn(client.password, "\n")] = '\0';
         //Verifier si le mot de passe recpecte les conditions
-        int status = password_check(client.password, client.fullName);
+        int status = password_check(client.password, client.nom);
         if (status){
             valid = 1;
             break;
@@ -204,7 +205,7 @@ void list_users(){
         for (int i=0; i<user_count; i++){
         printf("***************************************\n");
         printf("informations de l'utilisateur %d : \n", i+1);
-        printf("nom complet : %s\n", users[i].fullName);
+        printf("nom  : %s\n", users[i].nom);
         printf("user identifiant : %d\n", users[i].identifiant);
         printf("user role : %d\n", users[i].role);
         printf("mot de passe : %s\n", users[i].password);
@@ -255,7 +256,7 @@ void afficher_reclamation(){
                             index_identifiant = j;
                     }
                 }
-            printf("client : %s\n", users[index_identifiant].fullName);
+            printf("client : %s\n", users[index_identifiant].nom);
             printf("reclamation ID: %d\n", reclamations[i].ID);
             printf("motif : %s\n", reclamations[i].motif);
             printf("categorie : %s\n", reclamations[i].categorie);
@@ -374,21 +375,18 @@ void traiter_reclamation(){
 void chercher_reclamation(){
     int type_recherche;
     printf("Entrer la methode de recherche d'un reclamation : \n");
-    printf("[1].    Recherche par identifient.\n");
+    printf("[1].    Recherche par nom.\n");
     printf("[2].    Recherche par status.\n");
     printf("[3].    Recherche par date de reclamation.\n");
     printf("Entrer le nombre de votre choix : ");
     scanf("%d", &type_recherche);
     getchar();
     switch(type_recherche){
+   
         case 1:
-            recherche_identifiant();
+            recherche_nom();
             break;
         case 2:
-            //recherche_status();
-            printf("test.\n");
-            break;
-        case 3:
             //recherche_date();
             printf("test\n");
             break;
@@ -417,6 +415,39 @@ int recherche_identifiant(){
 
     } 
 }
+void recherche_nom(){
+    char client_nom[30];
+    int client_indice = -1;
+    printf("Entrer le nom de client : ");
+    fgets(client_nom, 30, stdin);
+    client_nom[strcspn(client_nom, "\n")] = '\0';
+    for (int i=0; i<user_count; i++){
+        if(strcmp(client_nom, users[i].nom) == 0){
+            client_indice = i;
+        }
+    }
+    if(client_indice == -1){
+        printf("Pas de recla,ation avec cette nom.\n");
+    }
+    else {
+         for (int i=0; i<reclamation_count; i++){
+         if(reclamations[i].user_identifiant == users[client_indice].identifiant){
+            printf("*********************************************\n");
+                printf("Reclamation rechercher : \n");
+                printf("client : %s\n", users[client_indice].nom);
+                printf("reclamation ID: %d\n", reclamations[i].ID);
+                printf("motif : %s\n", reclamations[i].motif);
+                printf("categorie : %s\n", reclamations[i].categorie);
+                printf("Description : %s\n", reclamations[i].description);
+                printf("status de reclamation : %s\n", reclamations[i].status);
+                printf("date : %s\n",reclamations[i].date );
+            printf("*********************************************\n");
+        
+        }
+        break;
+    }
+    }  
+}
 //admin menu
 void admin_menu(){
     int choix_admin;
@@ -429,7 +460,7 @@ void admin_menu(){
         printf("5.  supprimer reclamation.\n");
         printf("6.  traitement des reclamations.\n");
         //test
-        printf("7.  nombre de status traiter.\n");
+        printf("7.  chercher reclamation.\n");
         printf("0.  Revenue au menu principale.\n");
         printf("Choisit l'opperation : ");
         scanf("%d", &choix_admin);
@@ -454,8 +485,7 @@ void admin_menu(){
                 traiter_reclamation();
                 break;
             case 7:
-                //test de option de calculer nombre de status traiter
-                printf("status : %d", status_traiter_counter);
+                chercher_reclamation();
                 break;
             case 0:
                 break;
