@@ -14,6 +14,9 @@ void agent_menu();
 void client_menu();
 int user_role(int index);
 void menu_role(int userIndex);
+int recherche_date();
+int recherche_status();
+int recherche_identifiant();
 //void menu_gestion();
 //global variables et initialisation
 int user_count = 1;
@@ -338,21 +341,22 @@ void traiter_reclamation(){
         printf("Pas de reclamation a traiter.\n");
         return;
     }
-    printf("Entrer l'identifiant de reclamation a traiter : ");
+    printf("Entrer ID de reclamation a traiter : ");
     scanf("%d", &id_traiter);
     getchar();
-    int index_traiter = -1;
-    for (int i=0; i<reclamation_count; i++){
-        if(reclamations[i].user_identifiant == id_traiter){
-            index_traiter = i;
-            break;
-        }
-    }
-    if(index_traiter == -1){
-        printf("Reclamation a traiter n'existe pas.!\n");
-        return;
-    }
-    else {
+    //int index_traiter = -1;
+    // for (int i=0; i<reclamation_count; i++){
+    //     if(reclamations[i].user_identifiant == id_traiter){
+    //         index_traiter = i;
+    //         break;
+    //     }
+    // }
+    // if(index_traiter == -1){
+    //     printf("Reclamation a traiter n'existe pas.!\n");
+    //     return;
+    // }
+    int index_traiter = recherche_identifiant();//renvoi l'indice de reclamation chercher
+    if (index_traiter == id_traiter){
         printf("choisit le nouveau status : \n");
         printf("    en cours.\n");
         printf("    resolue.\n");
@@ -360,8 +364,58 @@ void traiter_reclamation(){
         fgets(reclamations[index_traiter].status, 30, stdin);
         reclamations[index_traiter].status[strcspn(reclamations[index_traiter].status, "\n")] = '\0';
         printf("status et bien traiter.\n");
+        status_traiter_counter++;
     }
-    status_traiter_counter++;
+    else {
+        printf("Pas de reclamation avec cette ID.\n");
+    }
+    
+}
+void chercher_reclamation(){
+    int type_recherche;
+    printf("Entrer la methode de recherche d'un reclamation : \n");
+    printf("[1].    Recherche par identifient.\n");
+    printf("[2].    Recherche par status.\n");
+    printf("[3].    Recherche par date de reclamation.\n");
+    printf("Entrer le nombre de votre choix : ");
+    scanf("%d", &type_recherche);
+    getchar();
+    switch(type_recherche){
+        case 1:
+            recherche_identifiant();
+            break;
+        case 2:
+            //recherche_status();
+            printf("test.\n");
+            break;
+        case 3:
+            //recherche_date();
+            printf("test\n");
+            break;
+        case 0:
+            break;
+        default :
+            printf("choix invalide!\n");
+    }
+}
+int recherche_identifiant(){
+    int indice;
+    int indice_chercher;
+    printf("Entrer ID du reclamation chercher : ");
+    scanf("%d", &indice);
+    getchar();
+    if(indice < 0 || indice > nouveau_reclamation){
+        return -1;
+    }
+    else {
+        for (int i=0; i<reclamation_count; i++){
+            if(indice == reclamations[i].ID){
+                indice_chercher = i;
+                return indice_chercher;
+            }
+        }
+
+    } 
 }
 //admin menu
 void admin_menu(){
