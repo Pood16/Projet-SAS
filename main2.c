@@ -254,6 +254,7 @@ void afficher_reclamation(){
                     for (int j=0; j<user_count; j++){
                         if (reclamations[i].user_identifiant == users[j].identifiant){
                             index_identifiant = j;
+                            break;
                     }
                 }
             printf("client : %s\n", users[index_identifiant].nom);
@@ -431,8 +432,8 @@ void recherche_nom(){
     }
     else {
          for (int i=0; i<reclamation_count; i++){
-         if(reclamations[i].user_identifiant == users[client_indice].identifiant){
-            printf("*********************************************\n");
+            if(reclamations[i].user_identifiant == users[client_indice].identifiant){
+                printf("*********************************************\n");
                 printf("Reclamation rechercher : \n");
                 printf("client : %s\n", users[client_indice].nom);
                 printf("reclamation ID: %d\n", reclamations[i].ID);
@@ -441,10 +442,10 @@ void recherche_nom(){
                 printf("Description : %s\n", reclamations[i].description);
                 printf("status de reclamation : %s\n", reclamations[i].status);
                 printf("date : %s\n",reclamations[i].date );
-            printf("*********************************************\n");
+                printf("*********************************************\n");
         
         }
-        break;
+        
     }
     }  
 }
