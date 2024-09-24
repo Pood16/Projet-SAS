@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h> 
 #include <time.h>
+#include <windows.h>
 #define MAX_USERS 100
 #define MAX_RECLAMATION 100
 //declaration des fonctions
@@ -13,7 +14,7 @@ void admin_menu();
 void agent_menu();
 void client_menu();
 int user_role(int index);
-void menu_role(int userIndex);
+void menu_role(int userRole);
 int recherche_date();
 void recherche_status();
 void recherche_nom();
@@ -22,6 +23,7 @@ void recherche_identifiant();
 //global variables et initialisation
 int user_count = 1;
 int reclamation_count = 0;
+int user_index = 0;
 //user structure
 typedef struct {
     char nom[50];
@@ -59,8 +61,7 @@ void creer_compte(){
         printf("Le maximum des clienrs est atteinte.\n");
     }
     User client;
-    int valid = 0;
-    client.role = 2;
+    client.role = 2;//2 user = client
     client.identifiant = user_count;
     printf("Entrer les informations suivantes : \n");
     //saisir le nom complet de client
@@ -73,9 +74,10 @@ void creer_compte(){
         fgets(client.password, 50, stdin);
         client.password[strcspn(client.password, "\n")] = '\0';
         //Verifier si le mot de passe recpecte les conditions
-        int status = password_check(client.password, client.nom);
-        if (status){
-            valid = 1;
+        if (password_check(client.password, client.nom) == 1){
+            users[user_count] = client;
+            printf("Compte est creer avec l'identifiant : %d\n", user_count);
+            user_count++;
             break;
         }
         else {
@@ -87,16 +89,6 @@ void creer_compte(){
             printf("....................................\n");
         }
 
-    }
-    if (valid){
-        users[user_count] = client;
-        printf("Compte est creer avec l'identifiant : %d\n", user_count);
-        // test
-        // printf("identifiant : %d\n", users[user_count].identifiant);
-        // printf("password : %s\n", users[user_count].password);
-        // printf("role : %d\n", users[user_count].role);
-        // fin test
-        user_count++;
     }
 }
 //verifier le mot de passe
@@ -119,7 +111,7 @@ int password_check(char pass[], char name[]){
         else if ((pass[i] >= 33 && pass[i] <= 47) || (pass[i] >= 58 && pass[i] <= 64) || (pass[i] >= 91 && pass[i] <= 96) || (pass[i] >= 123 && pass[i] <= 126)) {
                 caractere = 1;
         } 
-        else if (pass[i] >= '0' && pass[i] <= '9') {  // Fix for digit
+        else if (pass[i] >= '0' && pass[i] <= '9') {  
                 chiffre = 1;
         }         
     }
@@ -128,58 +120,59 @@ int password_check(char pass[], char name[]){
     }
 }
 //Fonction de connexion
+int tentative = 0;
 void connecter_vous() {
     char pass[50];
-    int id, index = -1, exist = 0, tentative = 0;
-    while (tentative < 3) {  
-        printf("identifiant : ");
-        scanf("%d", &id);
-        getchar();  
-        printf("mot de passe : ");
-        fgets(pass, 50, stdin);
-        pass[strcspn(pass, "\n")] = '\0';  
-        for (int i = 0; i < user_count; i++) {
-            if (users[i].identifiant == id && strcmp(pass, users[i].password) == 0) {
-                exist = 1;
-                index = i;
-                break;  
-            }
-        }
-        if (exist) {
-            menu_role(users[index].role);
-            return;  
-        } else {
-            tentative++;  
-            printf("Identifiant ou mot de passe incorrect. Tentatives restantes : %d\n", 3 - tentative);
+    int id, user_exist = 0;
+    printf("Entrer votre identifiant : ");
+    scanf("%d", &id);
+    getchar();
+    printf("Entrer votre mot de passe : ");
+    fgets(pass, 50, stdin);
+    pass[strcspn(pass, "\n")] = '\0';
+    //user existe ou non
+    for (int i=0; i<user_count; i++){
+        if (users[i].identifiant == id && strcmp(users[i].password, pass) == 0){
+            user_exist = 1;
+            user_index = i;
         }
     }
-    if (tentative == 3) {
-        printf("3 tentatives de connexion echouees. Veuillez ressayer apres 10 secondes.\n");
-        sleep(10);  
+    if (user_exist == 1){
+        menu_role(users[user_index].role);
+        tentative = 0;//remise a 0 apres connexion
     }
-    connecter_vous();  
+    else {
+         printf("Identifiant ou mot de passe incorrect. Tentatives restantes : %d\n", 3 - tentative);
+         tentative++; 
+         if (tentative >= 3){
+             printf("password incorrecte, Essayer apres 10 seconde.\n");
+             Sleep(10000);
+             tentative = 0;//remise a 0 apres pause
+         }  
+       connecter_vous(); 
+    }
 }
 
 //fonction pour determiner le role de l'utilisateur
-int user_role(int userIndex){
-    if (users[userIndex].role == 0){
+int user_role(int userRole){
+    if (users[userRole].role == 0){
         return 0;//admine
     }
-    if (users[userIndex].role == 1){
+    if (users[userRole].role == 1){
         return 1;//agent de reclamation
     }
-    if (users[userIndex].role == 2){
+    if (users[userRole].role == 2){
         return 2;//client
     }
 }
-void menu_role(int userIndex){
-    if (userIndex == 0){
+void menu_role(int userRole){
+    if (userRole == 0){
         admin_menu();
     }
-    else if (userIndex == 1){
+    else if (userRole == 1){
         agent_menu();
     }
-    else if (userIndex == 2){
+    else if (userRole == 2){
         client_menu();
     }
 }
@@ -224,7 +217,7 @@ void creer_reclamation(){
         printf("impossible de creer une reclamation pour le moment.\n");
     }
     else {
-        strcpy(reclamations[reclamation_count].status, "en cours");
+        strcpy(reclamations[reclamation_count].status, "en cours");//par default en cours
         reclamations[reclamation_count].ID = nouveau_reclamation;
         printf("Entrer votre identifiat : ");
         scanf("%d", &reclamations[reclamation_count].user_identifiant);
@@ -239,8 +232,8 @@ void creer_reclamation(){
         fgets(reclamations[reclamation_count].categorie, 30, stdin);
         reclamations[reclamation_count].categorie[strcspn(reclamations[reclamation_count].categorie, "\n")] = '\0';
         time_t Date = time(NULL);
-        reclamations[reclamation_count].datE = time(NULL);
         strcpy(reclamations[reclamation_count].date, ctime(&Date));
+        reclamations[reclamation_count].datE = time(NULL);
         printf("reclamation numero %d a ete bien creer avec un ID %d.\n", nouveau_reclamation, nouveau_reclamation);
         //introduire la prioriter
         if (strstr(reclamations[reclamation_count].description, "critique") != NULL){
@@ -282,17 +275,30 @@ void afficher_reclamation(){
                 printf("categorie : %s\n", reclamations[i].categorie);
                 printf("Description : %s\n", reclamations[i].description);
                 printf("status de reclamation : %s\n", reclamations[i].status);
-                printf("date : %s\n",reclamations[i].date );
                 printf("status de priorite : %s\n", reclamations[i].prioriter);
                 printf("ordre de priorite : %d\n", reclamations[i].ordre_prioriter);
+                printf("date : %s\n",reclamations[i].date );
         }
     }  
+}
+void afficher_par_priorite(){
+    Reclamation tmp;
+    for (int i=0; i < reclamation_count; i++){
+        for (int j=i+1; j < reclamation_count; j++){
+            if (reclamations[i].ordre_prioriter < reclamations[j].ordre_prioriter){
+                tmp = reclamations[i];
+                reclamations[i] = reclamations[j];
+                reclamations[j] = tmp;
+            }
+        }
+    }
 }
 
 void modifier_reclamation(){
     time_t modification_time = time(NULL);
     int id_reclamation;
     int index_reclamation = -1;
+    int index_user = -1;
     //verifier si la reclamation existe
     if (reclamation_count == 0){
         printf("opperation impossible : Pas de reclamation.\n");
@@ -304,16 +310,30 @@ void modifier_reclamation(){
     getchar();
     for (int i=0; i<reclamation_count; i++){
         if (id_reclamation == reclamations[i].ID){
-            index_reclamation = i;
+            index_reclamation = i;//indix  de reclamation
+            break;
+        }
+        
+    }
+    if (index_reclamation == -1) {
+        printf("Reclamation non trouvee.\n");
+        return;
+    }
+    int diftime = difftime(modification_time, reclamations[index_reclamation].datE);
+    //on cherche l'index de l'utilisateur
+    
+    for (int i=0; i<user_count; i++){
+        if(reclamations[index_reclamation].user_identifiant == users[i].identifiant){
+            index_user = i;
             break;
         }
     }
-    //exit si la reclamation n'existe pas
-    if(index_reclamation < 0 || index_reclamation > reclamation_count){
-        printf("reclamation avec cet ID n'existe pas pour le moment.\n");
+    if (index_user == -1) {
+        printf("Utilisateur non trouve.\n");
         return;
     }
-    else if (users[index_reclamation].role == 0 || users[index_reclamation].role == 1 || users[index_reclamation].role == 2 && (reclamations[index_reclamation].ID == users[index_reclamation].identifiant && difftime(modification_time, reclamations[index_reclamation].datE) < 24 * 3600)){
+    printf("index = %d identifiant = %d role %d\n", index_user, users[index_user].identifiant, users[index_user].role);
+    if (users[index_user].role == 0 || users[index_user].role == 1 || (users[index_user].role == 2 && diftime < 5)){
            printf("*************************************************\n");
            printf("nouveau motif : ");
            fgets(reclamations[index_reclamation].motif, 30, stdin);
