@@ -62,6 +62,7 @@ typedef struct {
     char prioriter[30];
     int ordre_prioriter;
     time_t date_creation;
+    time_t date_traiter;
 } Reclamation;
 Reclamation reclamations[MAX_RECLAMATION];
 
@@ -440,7 +441,7 @@ void traiter_reclamation() {
         printf("Reclamation a traiter n'existe pas!\n");
         return;
     }
-
+    time(&reclamations[index_traiter].date_traiter);
     printf("Choisir le nouveau statut :\n");
     printf("1. En cours\n");
     printf("2. Resolue\n");
@@ -463,7 +464,7 @@ void traiter_reclamation() {
             printf("Choix invalide.\n");
             return;
     }
-    printf("Statut modifie avec succes.\n");
+    printf("reclamation est traitee avec succes.\n");
     reclamation_traiter++;
 }
 
@@ -624,6 +625,8 @@ void statistiques_rapport(){
     int statique_choix;
     float taux;
     taux = ((reclamation_traiter * 1.0)/(reclamation_count * 1.0)) * 100;
+    double delai_moyenne = 0;
+    double delai;
     do {
         printf("1.  nombre totale de reclamations.\n");
         printf("2.  taux de resolutions.\n");
@@ -638,10 +641,17 @@ void statistiques_rapport(){
                 printf("nombre totale de reclamation est : %d\n", reclamation_count);
                 break;
             case 2:
-                printf("taux de resolutions : %.2f\n", taux);
+                printf("taux de resolutions : %.2f %%\n", taux);
                 break;
             case 3:
-                printf("1\n");
+                for (int i=0; i<reclamation_count; i++){
+                    if (strcmp(reclamations[i].status, "en cours") != 0){
+                        delai_moyenne += difftime(reclamations[i].date_traiter, reclamations[i].date_creation);
+                    }
+                    
+                }
+                delai = delai_moyenne / (double)(reclamation_count);
+                printf("Le delai moyenne est : %.2lf secondes\n", delai);
                 break;
             case 4:
                 printf("rapport\n");
