@@ -154,7 +154,7 @@ void connecter_vous() {
     connecter_vous();
 }
 
-// Function to determine user role
+//  user role
 void menu_role(int userRole) {
     switch (userRole) {
         case 0: admin_menu(); break;
@@ -259,6 +259,7 @@ void afficher_reclamation() {
     }
     for (int i = 0; i < reclamation_count; i++) {
         printf("***************************************\n");
+        printf("client : %s\n", users[reclamations[i].userIndex].nom);
         printf("Reclamation ID: %d\n", reclamations[i].ID);
         printf("motif : %s\n", reclamations[i].motif);
         printf("categorie : %s\n", reclamations[i].categorie);
@@ -341,12 +342,13 @@ void modifier_reclamation() {
 }
 void modifier_reclamation_client(){
     int id_reclamation;
-    int modifier = 0;
+    int exist = 0;
     printf("ID de reclamation a modifier : ");
     scanf("%d", &id_reclamation);
     getchar();
     for (int i=0; i<reclamation_count; i++){
         if (id_reclamation == reclamations[i].ID && reclamations[i].userIndex == user_index){ 
+            exist = 1;
             time_t date_actuelle = time(NULL);
             if (difftime(date_actuelle, tmp) < 20){
                 printf("Nouveau motif : ");
@@ -362,13 +364,11 @@ void modifier_reclamation_client(){
             }
             else {
                 printf("vous avez depassez 24 heures.\n");
-            }
-                
-            
+            } 
         }
-        else {
-            printf("Pas de reclamation avec cette ID.\n");
-        }
+    }
+    if (!exist){
+        printf("Pas de reclamation avec cette ID\n");
     }
 
 }
@@ -452,7 +452,7 @@ void traiter_reclamation() {
     printf("Statut modifie avec succes.\n");
 }
 
-// Search for a claim
+//chercher reclamation
 void chercher_reclamation() {
     int type_recherche;
     printf("Entrer la methode de recherche d'une reclamation : \n");
@@ -478,7 +478,7 @@ void chercher_reclamation() {
     }
 }
 
-// Search claim by ID
+//chercher reclamation par ID
 void recherche_identifiant() {
     int indice;
     printf("Entrer ID de la reclamation cherchee : ");
@@ -489,7 +489,7 @@ void recherche_identifiant() {
         if (indice == reclamations[i].ID) {
             printf("*********************************************\n");
             printf("Reclamation recherchee : \n");
-            printf("ID: %d\n", reclamations[i].ID);
+            printf("client : %s\n", users[reclamations[i].ID].nom);
             printf("User ID: %d\n", reclamations[i].user_identifiant);
             printf("Motif : %s\n", reclamations[i].motif);
             printf("Categorie : %s\n", reclamations[i].categorie);
@@ -503,38 +503,34 @@ void recherche_identifiant() {
     printf("Pas de reclamation avec cet ID.\n");
 }
 
-// Search claim by user name
+// chercher reclamation par nom
 void recherche_nom() {
     char client_nom[50];
     printf("Entrer le nom du client : ");
     fgets(client_nom, sizeof(client_nom), stdin);
     client_nom[strcspn(client_nom, "\n")] = '\0';
-
     int found = 0;
     for (int i = 0; i < user_count; i++) {
-        if (strcmp(client_nom, users[i].nom) == 0) {
-            for (int j = 0; j < reclamation_count; j++) {
-                if (reclamations[j].user_identifiant == users[i].identifiant) {
+        if (strcmp(client_nom, users[reclamations[i].userIndex].nom) == 0) {
+            found = 1;
                     printf("*********************************************\n");
-                    printf("Reclamation trouvee : \n");
-                    printf("ID: %d\n", reclamations[j].ID);
-                    printf("Motif : %s\n", reclamations[j].motif);
-                    printf("Categorie : %s\n", reclamations[j].categorie);
-                    printf("Description : %s\n", reclamations[j].description);
-                    printf("Statut : %s\n", reclamations[j].status);
-                    printf("Date : %s\n", reclamations[j].date);
-                    printf("*********************************************\n");
-                    found = 1;
-                }
-            }
+                    printf("    Reclamation trouvee : \n");
+                    printf("client : %s\n", users[reclamations[i].ID].nom);
+                    printf("Motif : %s\n", reclamations[i].motif);
+                    printf("Categorie : %s\n", reclamations[i].categorie);
+                    printf("Description : %s\n", reclamations[i].description);
+                    printf("Statut : %s\n", reclamations[i].status);
+                    printf("Date : %s\n", reclamations[i].date);
+                    printf("*********************************************\n");   
         }
+        
     }
     if (!found) {
         printf("Pas de reclamation pour ce client.\n");
     }
 }
 
-// Search claim by status
+// chercher par status
 void recherche_status() {
     char status_chercher[20];
     printf("Choisir le statut de reclamation a chercher : \n");
@@ -564,7 +560,7 @@ void recherche_status() {
     for (int i = 0; i < reclamation_count; i++) {
         if (strcmp(status_chercher, reclamations[i].status) == 0) {
             printf("*********************************************\n");
-            printf("ID: %d\n", reclamations[i].ID);
+            printf("client : %s\n", users[reclamations[i].ID].nom);
             printf("User ID: %d\n", reclamations[i].user_identifiant);
             printf("Motif : %s\n", reclamations[i].motif);
             printf("Categorie : %s\n", reclamations[i].categorie);
@@ -691,7 +687,7 @@ void client_menu() {
 
 int main() {
     int choix;
-    admin();  // Create initial admin account
+    admin();  // initialiser admin
 
     do {
         printf("\n===== Bienvenue sur votre application de gestion des reclamations =======\n");
