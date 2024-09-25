@@ -61,6 +61,7 @@ typedef struct {
     char datE[30];
     char prioriter[30];
     int ordre_prioriter;
+    time_t date_creation;
 } Reclamation;
 Reclamation reclamations[MAX_RECLAMATION];
 
@@ -242,7 +243,7 @@ void creer_reclamation() {
         fgets(new_reclamation.categorie, sizeof(new_reclamation.categorie), stdin);
         new_reclamation.categorie[strcspn(new_reclamation.categorie, "\n")] = '\0';
 
-        time(&tmp);
+        time(&new_reclamation.date_creation);
         
         time_t Date = time(NULL);
         strcpy(new_reclamation.date, ctime(&Date));
@@ -305,8 +306,8 @@ void afficher_par_priorite() {
     }
     for (int i = 0; i < reclamation_count; i++) {
         printf("***************************************\n");
+        printf("client : %s\n", users[reclamations[i].userIndex].nom);
         printf("Reclamation ID: %d\n", reclamations[i].ID);
-        printf("User ID: %d\n", reclamations[i].user_identifiant);
         printf("motif : %s\n", reclamations[i].motif);
         printf("categorie : %s\n", reclamations[i].categorie);
         printf("Description : %s\n", reclamations[i].description);
@@ -361,7 +362,9 @@ void modifier_reclamation_client(){
         if (id_reclamation == reclamations[i].ID && reclamations[i].userIndex == user_index){ 
             exist = 1;
             time_t date_actuelle = time(NULL);
-            if (difftime(date_actuelle, tmp) < 20){
+            double diff_time = difftime(date_actuelle, reclamations[i].date_creation) / 3600;
+            printf("le temps passer = %.2lf heures\n", diff_time);
+            if ( diff_time < 24){
                 printf("Nouveau motif : ");
                 fgets(reclamations[i].motif, sizeof(reclamations[i].motif), stdin);
                 reclamations[i].motif[strcspn(reclamations[i].motif, "\n")] = '\0';
@@ -471,7 +474,7 @@ void chercher_reclamation() {
     printf("1. Chercher par ID\n");
     printf("2. Chercher par nom\n");
     printf("3. Chercher par statut\n");
-    
+    printf("4.  chercher par date.\n");
     printf("Entrer le nombre de votre choix : ");
     scanf("%d", &type_recherche);
     getchar();
