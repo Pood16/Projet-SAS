@@ -119,22 +119,21 @@ int password_check(char pass[], char name[]) {
         return 0;
     }
 
-    for (int i = 0; pass[i]; i++) {
-        if (pass[i] >= 'A' && pass[i] <= 'Z') {
+    for (int i=0; i< strlen(pass); i++){
+        if (pass[i] >= 65 && pass[i] <= 90){
             majuscule = 1;
-        }   
-        else if (pass[i] >= 'a' && pass[i] <= 'z') {
+        }
+        else if (pass[i] >= 97 && pass[i] <= 122){
             minuscule = 1;
         }
-        else if (pass[i] >= '0' && pass[i] <= '9') {
+        else if (pass[i] >= 48 && pass[i] <= 57) {
             chiffre = 1;
-        }
-        else {
+        } else if((pass[i] >= 33 && pass[i] <= 47) || (pass[i] >= 58 &&pass[i] <= 64) ||( pass[i] >= 91 &&pass[i] <= 96) || (pass[i] >= 123 &&pass[i] <= 126)) {
             caractere = 1;
         }
+    }
 
     return (majuscule && minuscule && caractere && chiffre);
-    }
 }
 // Login function
 
