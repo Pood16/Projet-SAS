@@ -98,7 +98,7 @@ void creer_compte() {
 
         if (password_check(client.password, client.nom)) {
             users[user_count] = client;
-            printf("Compte est cree avec l'identifiant : %d\n", user_count);
+            printf("----- Compte est cree avec l'identifiant : %d\n", user_count);
             user_count++;
             break;
         } else {
@@ -120,15 +120,22 @@ int password_check(char pass[], char name[]) {
     }
 
     for (int i = 0; pass[i]; i++) {
-        if (pass[i] >= 'A' && pass[i] <= 'Z') majuscule = 1;
-        else if (pass[i] >= 'a' && pass[i] <= 'z') minuscule = 1;
-        else if (pass[i] >= '0' && pass[i] <= '9') chiffre = 1;
-        else caractere = 1;
-    }
+        if (pass[i] >= 'A' && pass[i] <= 'Z') {
+            majuscule = 1;
+        }   
+        else if (pass[i] >= 'a' && pass[i] <= 'z') {
+            minuscule = 1;
+        }
+        else if (pass[i] >= '0' && pass[i] <= '9') {
+            chiffre = 1;
+        }
+        else {
+            caractere = 1;
+        }
 
     return (majuscule && minuscule && caractere && chiffre);
+    }
 }
-
 // Login function
 
 void connecter_vous() {
@@ -158,10 +165,10 @@ void connecter_vous() {
         printf("Identifiant ou mot de passe incorrect. Tentatives restantes : %d\n", 2 - tentative);
         tentative++;
         if (tentative >= 3) {
-        printf("Trop de tentatives incorrectes. Essayez apres 5 secondes.\n");
-        Sleep(5000);
-        tentative = 0;
-    }
+            printf("plus de 3 tentatives incorrectes. Essayez apres 5 secondes.\n");
+            Sleep(5000);
+            tentative = 0;
+        }
      connecter_vous();
     }
 
@@ -172,10 +179,13 @@ void connecter_vous() {
 //  user role
 void menu_role(int userRole) {
     switch (userRole) {
-        case 0: admin_menu(); break;
-        case 1: agent_menu(); break;
-        case 2: client_menu(); break;
-        default: printf("Role non reconnu.\n");
+        case 0: admin_menu();
+            break;
+        case 1: agent_menu();
+            break;
+        case 2: client_menu();
+            break;
+        default: printf("role n'existe pas.\n");
     }
 }
 
@@ -550,7 +560,6 @@ void recherche_nom() {
         printf("Pas de reclamation pour ce client.\n");
     }
 }
-
 // chercher par status
 void recherche_status() {
     char status_chercher[20];
@@ -624,9 +633,9 @@ void recherche_date(){
 void statistiques_rapport(){
     int statique_choix;
     float taux;
-    taux = ((reclamation_traiter * 1.0)/(reclamation_count * 1.0)) * 100;
     double delai_moyenne = 0;
     double delai;
+    int resolu = 0;
     do {
         printf("1.  nombre totale de reclamations.\n");
         printf("2.  taux de resolutions.\n");
@@ -641,7 +650,13 @@ void statistiques_rapport(){
                 printf("nombre totale de reclamation est : %d\n", reclamation_count);
                 break;
             case 2:
-                printf("taux de resolutions : %.2f %%\n", taux);
+                for (int i=0; i<reclamation_count; i++){
+                    if(strcmp(reclamations[i].status, "Resolue") == 0){
+                        resolu++;
+                    }
+                    taux = ((resolu * 1.0)/(reclamation_count * 1.0)) * 100;
+                    printf("taux de resolutions : %.2f %%\n", taux);
+                }
                 break;
             case 3:
                 for (int i=0; i<reclamation_count; i++){
@@ -653,11 +668,7 @@ void statistiques_rapport(){
                 delai = delai_moyenne / (double)(reclamation_count);
                 printf("Le delai moyenne est : %.2lf secondes\n", delai);
                 break;
-            case 4:
-                printf("rapport\n");
-                break;
-            case 0:
-                break;
+            
             default:
                 printf("mauvaise choix.\n");
                 break;
@@ -665,6 +676,7 @@ void statistiques_rapport(){
         }
     }while(statique_choix != 0);
 }
+
 // Admin menu
 void admin_menu() {
     int choix_admin;
@@ -703,6 +715,7 @@ void admin_menu() {
             case 6:
                 traiter_reclamation();
                 break;
+
             case 7:
                 chercher_reclamation();
                 break;
@@ -799,7 +812,7 @@ int main() {
                 break;
             case 2: connecter_vous();
                 break;
-            case 0: printf("Au revoir!\n");
+            case 0: 
                 break;
             default: printf("Choix non valide!\n");
                 break;
