@@ -19,6 +19,7 @@ void menu_role(int userRole);
 void recherche_status();
 void recherche_nom();
 void recherche_identifiant();
+void recherche_date();
 void connecter_vous();
 void gerer_role();
 void list_users();
@@ -36,7 +37,9 @@ int user_count = 1;
 int reclamation_count = 0;
 int user_index = 0;
 time_t tmp = 0;
+//time_t Date = 0;
 int reclamation_traiter = 0;
+int tentative = 0;
 // User structure
 typedef struct {
     char nom[50];
@@ -55,7 +58,7 @@ typedef struct {
     char categorie[30];
     char status[30];
     char date[30];
-    time_t datE;
+    char datE[30];
     char prioriter[30];
     int ordre_prioriter;
 } Reclamation;
@@ -125,7 +128,7 @@ int password_check(char pass[], char name[]) {
 }
 
 // Login function
-int tentative = 0;
+
 void connecter_vous() {
     char pass[50];
     int id;
@@ -208,6 +211,7 @@ void list_users() {
 
 // Creer Reclamation
 void creer_reclamation() {
+
     if (reclamation_count >= MAX_RECLAMATION) {
         printf("Impossible de creer une reclamation pour le moment.\n");
         return;
@@ -228,13 +232,14 @@ void creer_reclamation() {
         printf("categorie : ");
         fgets(new_reclamation.categorie, sizeof(new_reclamation.categorie), stdin);
         new_reclamation.categorie[strcspn(new_reclamation.categorie, "\n")] = '\0';
+
         time(&tmp);
+        
         time_t Date = time(NULL);
         strcpy(new_reclamation.date, ctime(&Date));
-
-
-        time(&reclamations[reclamation_count].datE);//pour le mot de passe
-
+        strftime(new_reclamation.datE, sizeof(new_reclamation.datE), "%x", localtime(&Date));
+        printf("date : %s\n", new_reclamation.datE);
+        
         if (strstr(new_reclamation.description, "critique") != NULL) {
             strcpy(new_reclamation.prioriter, "Haute");
             new_reclamation.ordre_prioriter = 0;
@@ -457,9 +462,9 @@ void chercher_reclamation() {
     printf("1. Chercher par ID\n");
     printf("2. Chercher par nom\n");
     printf("3. Chercher par statut\n");
+    
     printf("Entrer le nombre de votre choix : ");
     scanf("%d", &type_recherche);
-    getchar();
 
     switch(type_recherche) {
         case 1:
@@ -470,6 +475,9 @@ void chercher_reclamation() {
             break;
         case 3:
             recherche_status();
+            break;
+        case 4:
+            recherche_date();
             break;
         default:
             printf("Choix invalide!\n");
@@ -573,6 +581,31 @@ void recherche_status() {
     if (!found) {
         printf("Pas de reclamation avec ce statut.\n");
     }
+}
+void recherche_date(){
+    char dateTemp[30];
+    printf("1.Entrer date sous forme de: mm/dd/yy: ");
+    scanf("%s",&dateTemp);
+    getchar();
+    int trouver = 0;
+    for (int i = 0; i < reclamation_count;i++) {
+        if (strcmp(reclamations[i].datE,dateTemp) == 0) {
+            trouver = 1;
+            printf("*********************************************\n");
+            printf("    Reclamation trouvee : \n");
+            printf("client : %s\n", users[reclamations[i].userIndex].nom);
+            printf("reclamation ID : %d\n", reclamations[i].ID);
+            printf("Motif : %s\n", reclamations[i].motif);
+            printf("Categorie : %s\n", reclamations[i].categorie);
+            printf("Description : %s\n", reclamations[i].description);
+            printf("Statut : %s\n", reclamations[i].status);
+            printf("Date : %s\n", reclamations[i].date);
+            printf("*********************************************\n");   
+        }
+    }
+    if(!trouver){
+        printf("pas de reclamation dans cette date.\n");
+    }  
 }
 void statistiques_rapport(){
     int statique_choix;
