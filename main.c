@@ -131,31 +131,40 @@ int password_check(char pass[], char name[]) {
 
 void connecter_vous() {
     char pass[50];
-    int id;
-    printf("Entrer votre identifiant : ");
-    scanf("%d", &id);
-    getchar();
+    char name[50];
+    int connexion = 0;
+    printf("Entrer votre nom : ");
+    fgets(name, sizeof(name), stdin);
+    name[strcspn(name, "\n")] = '\0';
+
     printf("Entrer votre mot de passe : ");
     fgets(pass, sizeof(pass), stdin);
     pass[strcspn(pass, "\n")] = '\0';
 
     for (int i = 0; i < user_count; i++) {
-        if (users[i].identifiant == id && strcmp(users[i].password, pass) == 0) {
+        if (strcmp(name, users[i].nom) == 0 && strcmp(users[i].password, pass) == 0) {
             user_index = i;
-            menu_role(users[i].role);
-            tentative = 0;
-            return;
+            connexion = 1;
         }
     }
-
-    printf("Identifiant ou mot de passe incorrect. Tentatives restantes : %d\n", 2 - tentative);
-    tentative++;
-    if (tentative >= 3) {
+    if (connexion){
+            printf("Bienvenue %s : \n", users[user_index].nom);
+            menu_role(users[user_index].role);
+            tentative = 0;
+    }
+    else {
+        printf("Identifiant ou mot de passe incorrect. Tentatives restantes : %d\n", 2 - tentative);
+        tentative++;
+        if (tentative >= 3) {
         printf("Trop de tentatives incorrectes. Essayez apres 5 secondes.\n");
         Sleep(5000);
         tentative = 0;
     }
-    connecter_vous();
+     connecter_vous();
+    }
+
+    
+    
 }
 
 //  user role
@@ -465,6 +474,7 @@ void chercher_reclamation() {
     
     printf("Entrer le nombre de votre choix : ");
     scanf("%d", &type_recherche);
+    getchar();
 
     switch(type_recherche) {
         case 1:
@@ -511,13 +521,13 @@ void recherche_identifiant() {
 
 // chercher reclamation par nom
 void recherche_nom() {
-    char client_nom[50];
+    char name[50];
     printf("Entrer le nom du client : ");
-    fgets(client_nom, sizeof(client_nom), stdin);
-    client_nom[strcspn(client_nom, "\n")] = '\0';
+    fgets(name, 50, stdin);
+    name[strcspn(name, "\n")] = '\0';
     int found = 0;
     for (int i = 0; i < reclamation_count; i++) {
-        if (strcmp(client_nom, users[reclamations[i].userIndex].nom) == 0) {
+        if (strcmp(name, users[reclamations[i].userIndex].nom) == 0) {
             found = 1;
                     printf("*********************************************\n");
                     printf("    Reclamation trouvee : \n");
