@@ -452,9 +452,9 @@ void traiter_reclamation() {
     }
     time(&reclamations[index_traiter].date_traiter);
     printf("Choisir le nouveau statut :\n");
-    printf("1. En cours\n");
-    printf("2. Resolue\n");
-    printf("3. Fermee\n");
+    printf("1. en cours\n");
+    printf("2. resolue\n");
+    printf("3. fermee\n");
     int choix;
     scanf("%d", &choix);
     getchar();
@@ -564,7 +564,7 @@ void recherche_status() {
     char status_chercher[20];
     printf("Choisir le statut de reclamation a chercher : \n");
     printf("1. En cours\n");
-    printf("2. Resolue\n");
+    printf("2. resolue\n");
     printf("3. Fermee\n");
     int choix;
     scanf("%d", &choix);
@@ -632,8 +632,8 @@ void recherche_date(){
 void statistiques_rapport(){
     int statique_choix;
     float taux;
-    double delai_moyenne = 0;
-    double delai;
+    int delai_moyenne = 0;
+    int delai;
     int resolu = 0;
     do {
         printf("1.  nombre totale de reclamations.\n");
@@ -650,12 +650,12 @@ void statistiques_rapport(){
                 break;
             case 2:
                 for (int i=0; i<reclamation_count; i++){
-                    if(strcmp(reclamations[i].status, "Resolue") == 0){
+                    if(strcmp(reclamations[i].status, "resolue") == 0){
                         resolu++;
                     }
-                    taux = ((resolu * 1.0)/(reclamation_count * 1.0)) * 100;
-                    printf("taux de resolutions : %.2f %%\n", taux);
                 }
+                taux = ((resolu * 1.0)/(reclamation_count * 1.0)) * 100;
+                printf("taux de resolutions : %.2f %%\n", taux);
                 break;
             case 3:
                 for (int i=0; i<reclamation_count; i++){
@@ -664,8 +664,8 @@ void statistiques_rapport(){
                     }
                     
                 }
-                delai = delai_moyenne / (double)(reclamation_count);
-                printf("Le delai moyenne est : %.2lf secondes\n", delai);
+                delai = delai_moyenne / reclamation_count;
+                printf("Le delai moyenne est : %d secondes\n", delai);
                 break;
             
             default:
